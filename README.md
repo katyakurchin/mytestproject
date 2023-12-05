@@ -3,9 +3,9 @@
 This project focuses on analyzing the wine quality dataset, specifically the Portuguese "Vinho Verde" wine. The analysis aims to explore the relationship between various physicochemical properties of the wine and its quality rating. The dataset includes details on red and white variants of Vinho Verde, providing a comprehensive view of factors that influence wine quality.
 
 ## Objectives
-To understand the unique characteristics of the Vinho Verde wine in terms of physicochemical properties and quality.
-To compare red and white wine varieties in terms of quality metrics and chemical composition.
-To employ data science techniques for a nuanced understanding of wine quality determinants.
+- To understand the unique characteristics of the Vinho Verde wine in terms of physicochemical properties and quality.
+- To compare red and white wine varieties in terms of quality metrics and chemical composition.
+- To employ data science techniques for a nuanced understanding of wine quality determinants.
 
 ## Repository Structure
 datasets/: Contains the datasets used in the analysis.
