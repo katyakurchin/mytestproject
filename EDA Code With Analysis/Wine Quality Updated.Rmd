@@ -1,0 +1,434 @@
+---
+title: "test"
+author: "Katya Kurchin & Raanya Siddiqui"
+date: "2023-09-28"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r include=FALSE}
+library(httr)
+library(readr)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(reshape2)
+response_red <- GET("https://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-red.csv")
+response_white <- GET("https://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-white.csv")
+
+#Using a delimiter to remove the semicolons to seperate the columns
+data_red <- read_delim(content(response_red, "text"), delim = ";")
+data_white <- read_delim(content(response_white, "text"), delim = ";")
+
+#adds a column to depict wine type
+data_red$wine_type <- "red"
+data_white$wine_type <- "white"
+
+#combined dataset
+combined_data <- rbind(data_red, data_white)
+
+
+```
+##Introduction
+
+
+Certainly! I'll expand the introduction to provide more detail and context, focusing specifically on the Vinho Verde dataset and the motivations for choosing it.
+
+Expanded and Detailed Introduction:
+
+#Wine, a product deeply entrenched in cultural and economic fabrics worldwide, presents an intriguing subject for analysis due to its complex interplay of natural and human-made factors. While the general importance of wine is widely recognized, this study concentrates specifically on the Portuguese "Vinho Verde" - a unique variant in the vast tapestry of global wine production. The choice of the Vinho Verde dataset from the UCI Machine Learning Repository is not arbitrary; it stems from a keen interest in understanding how this particular wine, with its distinctive characteristics, fits into the broader narrative of wine quality and production.
+
+#Vinho Verde, known for its slight effervescence and distinctive flavor profile, offers a compelling case study due to its growing popularity and economic significance in Portugal's export markets. This dataset is especially valuable as it encompasses detailed information on various physicochemical properties and quality ratings of both red and white variants of Vinho Verde, providing a comprehensive insight into factors that are not typically the focus in global wine studies. The data, initially collected for exploring the relationship between these properties and the wine's quality, opens up avenues for a nuanced understanding of regional viticulture practices and their impact on wine quality.
+
+#The motivation behind delving into this dataset is multifold. Firstly, there is a curiosity about how Vinho Verde, as a region-specific wine, differentiates itself in terms of physicochemical properties and quality from more globally recognized wines. This includes an exploration of the unique terroir of the Vinho Verde region, the specific grape varieties used, and the traditional as well as modern winemaking processes employed. Secondly, the study aims to contribute to the growing field of oenology and viticulture by providing data-driven insights that could inform future wine production and marketing strategies, particularly for wines like Vinho Verde that hold a niche yet important place in the global market.
+
+#Moreover, this analysis is timely and relevant in the context of the evolving wine industry, where there is an increasing focus on understanding the scientific aspects of wine production and quality. By applying modern data science techniques to this dataset, the study aims to bridge the gap between traditional winemaking wisdom and contemporary analytical methods. The goal is to offer a comprehensive overview of the Vinho Verde dataset's structure, highlight key variables, and identify potential patterns or correlations that could lead to further research, ultimately contributing to the enhancement of Vinho Verde's quality and its position in the international wine market.
+
+
+##Overview of Vinho Verde Wine Data
+
+#Our analysis of the Vinho Verde wines from the UCI Machine Learning Repository is enriched by a diverse set of physicochemical properties and quality ratings. To enhance readability and focus on key aspects, the detailed descriptions of each variable are summarized below in a more narrative format, with essential highlights pointed out. For a comprehensive view, these variables can be detailed in tabular form separately.
+
+#1) Acidity Levels: The datasets capture different aspects of acidity in wine - Fixed Acidity, Volatile Acidity, and Citric Acid. These measures are crucial as they influence the wine's taste, stability, and color. Of particular interest is the balance between Fixed and Volatile Acidity, which can significantly affect the wine's overall quality.
+
+#2) Sugar and Alcohol Content: Residual Sugar and Alcohol content are key indicators of the wine's sweetness and strength. The residual sugar level, especially, differentiates wines on the dry-sweet spectrum and is a variable of interest for consumer preferences.
+
+#3) Sulfur Dioxide Levels: Both Free and Total Sulfur Dioxide are measured. These are important for preserving wine and preventing oxidation. The relationship between these variables and wine preservation is a point of interest.
+
+#4) Physical Properties: Density and pH offer insights into the wine's body and taste profile. The pH level, in particular, can inform us about the tartness or sharpness of the wine.
+
+#5) Additives and Quality: Sulphates, as an additive, and the overall Quality rating, based on sensory data, are critical to understanding wine production standards and consumer satisfaction.
+
+#6) Wine Type: An added variable distinguishing between red and white wines, essential for comparative analysis.
+
+#To assist the reader in navigating through the data, we have created a combined dataset amalgamating red and white wine data. This allows for a more comprehensive analysis and comparison between the two types. In the following sections, we will walk through these summaries, highlighting notable patterns and insights derived from the data, offering a clearer picture of the unique characteristics of Vinho Verde wines.
+
+
+
+```{r}
+# Displays the structure
+
+##Red wine
+str(data_red)
+
+##White wine
+str(data_white)
+
+
+# Displays the first few rows
+
+##Red wine
+head(data_red)
+
+##White wine
+head(data_white)
+
+# Displays the statistical summary
+
+##Red Wine
+summary(data_red)
+
+##White wine
+summary(data_white)
+```
+
+#Fixed Acidity: The red wine dataset shows a mean fixed acidity of approximately 6.855, whereas the details for the white wine in this respect are not visible in the provided data. Fixed acidity is an essential factor as it relates to the wine's pH balance, impacting its taste and aging capability.
+
+#Volatile Acidity: This parameter seems particularly interesting. For red wine, the average volatile acidity is approximately 0.2782. Volatile acidity is a crucial determinant in wine's taste. Higher values can lead to an unpleasant, vinegar taste, while moderate levels can enhance the wine's character. Thus, observing an average value of 0.2782 suggests that the red wines in this dataset generally maintain a balanced taste profile.
+
+#Citric Acid: This compound plays a vital role in imparting a fresh, fruity character to wines. A higher citric acid level usually indicates a more acidic and fresher tasting wine.
+
+#Residual Sugar: For red wine, the mean residual sugar is approximately 6.391. Residual sugar can significantly influence the sweetness of wine. The indicated mean value suggests that the red wines in this dataset lean more towards the sweeter side, which might appeal to those who prefer wines with a hint of sweetness.
+
+#Chlorides: This can be a marker for the saltiness in wine. It's important to note that elevated chloride levels might indicate contamination or a distinct flavor profile.
+
+#Density: The mean density value for red wine is roughly 0.9940. Density can be influenced by several factors in wine, including sugar and alcohol content. The observed mean suggests that the red wines in this collection have a relatively standard composition, neither too rich nor too diluted.
+
+#pH: With a mean pH of approximately 3.188 for red wine, it's evident that these wines are acidic, which is typical for wines. The pH level can influence a wine's tartness or crispness, making it an essential factor for its overall profile.
+
+#Sulphates: For red wines, the mean sulphates value is around 0.4898. Sulphates can act as antioxidants and preservatives in wine, preserving its freshness and preventing microbial growth.
+
+#Alcohol Content: The average alcohol content for red wines stands at roughly 10.51%. This level is within the standard range for most wines and indicates the strength and potential warmth the wine can offer upon consumption.
+
+#Quality: One of the most intriguing aspects is the wine quality. For red wines, the median quality score is 6, indicating that most wines in this dataset are of average quality. However, there's a range from 3 to 9, suggesting a wide variation in quality within the dataset.
+
+
+```{r}
+#Shows how many wines are in the dataset
+wine_counts <- table(combined_data$wine_type)
+pie(wine_counts, 
+    labels = paste(names(wine_counts), "\n", wine_counts),
+    main = "Distribution of Wine Types in the Dataset",
+    col = c("red", "gray"), 
+    clockwise = TRUE)  
+
+```
+#Wine Type: There are 4,898 instances of white wine, pointing towards a significant representation of this variety in the dataset. Such a number suggests a broad scope for analysis specifically related to white wines. In contrast, there are 1,599 instances of red wine, indicating a lesser representation but still a sizable amount for in-depth analysis. The comparative disparity in the number of samples between the two types might lead to varied insights, with the white wines potentially offering a broader range of data points and variability.
+
+#Considering this imbalance in representation, when comparing or analyzing trends between the two wine types, it is crucial to remember this sample size difference. Large sample sizes, as in the case of the white wine here, can often lead to finer details in variations, offering a more nuanced understanding of the particular wine type's characteristics. On the other hand, the red wine, while having fewer instances, can provide a more general overview of the characteristics that define this category.
+
+#Additionally, the differentiation between the two wine types provides an avenue to explore how each variety's inherent traits contribute to its overall quality and chemical composition. For instance, white wines are typically known for their acidity and crispness, while red wines are often recognized for their tannic structure and depth. Given the available dataset, one could delve deeper into how these general characteristics play out in terms of the chemical attributes listed.
+
+#Furthermore, the differentiation in wine type also opens up avenues for market analysis. The higher number of white wine samples might indicate a higher production or a more significant market demand for this variety, or it could simply be a factor of the data collection methodology. Conversely, while the red wine samples are fewer, they represent a vital segment of the wine industry that has its unique appeal and customer base.
+
+
+##Creating new datasets in regards to quality
+
+```{r}
+
+combined_data <- combined_data %>%
+  mutate(quality_category = ifelse(quality >= 6, "6 and above", "below 6"))
+
+# proportions of wine
+combined_summary <- combined_data %>%
+  group_by(wine_type, quality_category) %>%
+  summarise(count = n()) %>%
+  mutate(proportion = count / sum(count))
+
+#visualization
+ggplot(combined_summary, aes(x = quality_category, y = proportion, fill = wine_type)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Proportion of Wine Quality by Type",
+       x = "Quality Category",
+       y = "Proportion") +
+  theme_minimal() +
+  scale_fill_manual(values = c("red" = "red", "white" = "grey80")) +
+  scale_y_continuous(labels = scales::percent_format(scale = 1))
+
+```
+#Beginning with red wine, it is unmistakably evident that a majority of the samples assessed fall into the "6 and above" quality bracket. This might indicate a consistent production of red wine that meets or exceeds a certain taste or quality threshold. Red wine, in general, undergoes a longer aging process, which can sometimes result in a deeper, more robust flavor. This maturation might account for its higher scores, suggesting a preference for the rich, velvety textures and flavors that are often associated with red wines.
+
+#Contrastingly, white wine appears to have a relatively even distribution between the two quality categories. It's crucial to consider that white wines, with their crisper and lighter flavor profiles, might exhibit a broader spectrum of taste nuances. Given the variety of white wine grape types and the different production techniques, there is potential for varied outcomes in flavor, aroma, and mouthfeel, which can affect its rating. For instance, while a Chardonnay might be creamy and oak-infused, a Sauvignon Blanc might lean towards being zestier and more refreshing. Such diversity could lead to differing opinions on quality.
+
+#Furthermore, personal preferences and regional variations in taste could also play a role in these quality assessments. Some connoisseurs might lean towards the full-bodied taste of reds, while others might prefer the refreshing tang of a white. Nevertheless, this chart underscores the importance of continued refinement in wine production, as both red and white wines have room to grow and improve, ensuring that they consistently fall into the "6 and above" category. As the world of wine continues to evolve, driven by both tradition and innovation, it will be fascinating to observe how these quality metrics shift over time.
+
+#In our analysis of red wine quality, we initially categorized the samples into two groups: those rated "6 and above" and those "below 6." This division was guided by the dataset's median quality score, intending to distinguish between what could be considered above-average and below-average wines. However, this approach raises a valid question about the potential impact of this categorization on the analysis. Specifically, whether the observed trends are a result of where the threshold between the two groups is set.
+
+#Considering the Professor Palermo's feedback, a more nuanced analysis might involve examining the entire distribution of quality scores in a more granular fashion. For instance, instead of broadly categorizing wines as above or below a certain quality threshold, we could analyze them across a spectrum of scores. This approach would allow for a more detailed examination of how various factors, like alcohol content, correlate with incremental changes in quality ratings.
+
+#Moreover, the initial observation that a majority of the red wine samples fall into the "6 and above" quality bracket warrants a deeper investigation. While it's tempting to attribute this to the traditional aging process of red wines, which often leads to richer flavors and textures, a granular analysis might reveal more intricate patterns. For example, how does the aging process impact wines of different quality scores? Are higher-rated wines more likely to have undergone a longer aging process, or are other factors at play?
+
+#In summary, while our initial categorization provided a broad overview of red wine quality, a more detailed analysis of the entire quality score distribution could offer richer insights. This would enable us to better understand the nuances of red wine production and its relationship to perceived quality, moving beyond arbitrary thresholds to a more comprehensive understanding of the data.
+
+```{r}
+##Alcohol Content in Relation to Quality
+# Using ggplot2 to create a box plot
+ggplot(combined_data, aes(x = as.factor(quality), y = alcohol, fill = wine_type, group = interaction(wine_type, quality_category))) +
+  geom_boxplot() +
+  labs(title = "Distribution of Alcohol Content by Wine Quality",
+       x = "Quality",
+       y = "Alcohol Content (%)") +
+  theme_minimal() +
+  scale_fill_manual(values = c("red" = "red", "white" = "grey80")) +
+  facet_grid(~quality_category)  # Separate the plot based on quality category
+
+
+```
+#Delving deeper into the visualization, one cannot help but observe the variance in alcohol content across different quality ratings. A salient point of note is the trend where the median alcohol content appears to ascend with the increase in quality rating, especially pronounced in white wines. This suggests that for many wine enthusiasts and connoisseurs, a higher alcohol content might be synonymous with a richer, more full-bodied wine experience. However, the relationship between alcohol content and quality is not strictly linear, as evidenced by the broad spectrum of alcohol content percentages, especially in the higher quality categories.
+
+#A comparison between white and red wines within the chart reveals some intriguing distinctions. Predominantly, white wines demonstrate a broader range in alcohol percentages, particularly in the wines with a quality rating of 6 and above. This could be indicative of the versatile fermentation processes or the diverse grape varieties inherent to white wines, allowing them a more expansive alcohol content range without compromising on quality.
+
+#Furthermore, the presence of outliers, especially in wines rated between 3 and 5, offers an intriguing narrative. These wines defy the conventional alcohol content ranges for their respective quality brackets. Whether this deviation stems from unique production methodologies, specific wine varieties, or an unconventional balance of flavors remains a topic ripe for exploration.
+
+#The thoughtful bifurcation of wines into two primary quality categories - "6 and above" and "below 6" - underscores a pivotal aspect of wine appreciation. It subtly hints at a general consensus within the wine community, where wines rated 6 or higher are typically held in higher esteem. This distinction not only aids in understanding the general perception of wine quality but also highlights the stark differences in alcohol content distribution between superior and inferior wines.
+
+```{r}
+#Correlation of quality to alcohol content
+correlation_data <- combined_data %>%
+  group_by(wine_type, quality_category) %>%
+  summarize(correlation = cor(quality, alcohol, method = "pearson"))
+
+print(correlation_data)
+
+#visualization
+ggplot(correlation_data, aes(x = interaction(wine_type, quality_category), y = correlation, fill = wine_type)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Correlation between Quality and Alcohol Content",
+       x = "Group",
+       y = "Correlation Coefficient") +
+  theme_minimal() +
+  scale_fill_manual(values = c("red" = "red", "white" = "grey80")) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black")  # A line to represent zero for reference
+
+ggplot(combined_data, aes(x = as.factor(quality), y = alcohol, fill = wine_type)) +
+  geom_boxplot() +
+  labs(title = "Box Plot of Alcohol Content by Wine Quality",
+       x = "Quality",
+       y = "Alcohol Content (%)") +
+  theme_minimal() +
+  scale_fill_manual(values = c("red" = "red", "white" = "grey80"))
+
+```
+#The above graph provides a comprehensive insight into the intricate relationship between the alcohol content and perceived quality of wines, segmented by their type — red and white. The analysis employs the correlation coefficient, a statistical measure, to elucidate the strength and direction of the linear relationship between these two variables.
+
+#At an initial glance, it is discernible that for red wines rated 6 and above, there exists a robust positive correlation between alcohol content and quality, as indicated by the tall red bar nearing a coefficient of 0.3. This underscores a noteworthy premise: higher alcohol content in red wines is often associated with superior quality. Such wines might present a richer palate, sophisticated aroma, and a balanced flavor profile, attributes highly prized by oenophiles and connoisseurs.
+
+#Contrastingly, for white wines rated 6 and above, the correlation is more subdued, albeit still positive. The gray bar extending slightly above the zero mark suggests that while there exists a positive relationship between alcohol content and quality, it is less pronounced than its red wine counterparts. It indicates the inherent complexities of white wines, where other factors, perhaps acidity or sweetness, might play a more substaitnal role in determining its quality.
+
+#Delving into wines rated below 6, the correlation narrative shifts noticeably. Red wines in this bracket exhibit a mild negative correlation between alcohol content and quality. This intimates that lower quality red wines might attempt to compensate for their lack of nuanced flavors and aroma with higher alcohol content. Conversely, white wines rated below 6 present a near-neutral correlation, hovering just below the zero mark, underscoring the variability and multifaceted nature of white wine production and perception.
+
+```{r}
+#Fixed Acidity vs Volatile acidity 
+
+#rename columns for plotting
+combined_data_temp <- combined_data %>%
+  rename(
+    fixed_acidity = `fixed acidity`,
+    volatile_acidity = `volatile acidity`
+  )
+
+
+combined_data_melted <- reshape2::melt(combined_data_temp, id.vars = c("quality", "wine_type"), 
+measure.vars = c("fixed_acidity", "volatile_acidity"))
+
+ggplot(combined_data_melted, aes(x = quality, y = value, color = wine_type)) +
+  geom_point(aes(shape = wine_type), alpha = 0.6) +
+  labs(y = "Acidity Level") +
+  theme_minimal() +
+  scale_color_manual(values = c("red" = "red", "white" = "grey80")) +
+  facet_grid(variable ~ wine_type, scales = "free")
+
+
+
+
+```
+#The visual representation shown above divulges  insights into the nuanced relationship between the quality of wines and their respective acidity levels. This relationship is further delineated by wine type, either red or white, adding another layer of intricacy to our analysis.
+
+#Examining the red wines initially, we notice a scattered distribution of data points across various quality levels. However, our observation reveals that wines rated between 3 to 8 generally have acidity levels ranging between 0.4 to 1.6, with a few outliers reaching up to 16. It's intriguing to observe that wines rated 6, which might be considered 'average' in quality, have a broader spectrum of acidity levels compared to their counterparts. This could potentially hint at the versatility of red wines, allowing them to maintain an average quality despite variability in their acidity.
+
+#Shifting our focus to white wines, depicted with triangular markers, we observe something different. The data points are more condensed, suggesting a tighter range of acidity levels for white wines across quality ratings. For instance, wines of quality 4 to 8 predominantly maintain their acidity levels between 0.4 and 1.6. The more clustered nature of these data points underscores the potential consistency in the acidity profile of white wines, regardless of their perceived quality.
+
+#A unique aspect of this chart is the distinct demarcation between 'fixed acidity' and 'volatile acidity.' Fixed acidity tends to be associated with the intrinsic attributes of the wine, while volatile acidity often correlates with the wine's aging process and fermentation. This dichotomy is particularly pronounced in white wines, which display an appreciable variance in their acidity profiles based on the type of acidity.
+
+```{r}
+#Correlation of Acidity to quality
+# Correlation of fixed acidity with quality for Red Wines
+cor_fixed_quality_red <- cor(
+  subset(combined_data, wine_type == "red")$`fixed acidity`,
+  subset(combined_data, wine_type == "red")$quality
+)
+
+# Correlation of volatile acidity with quality for Red Wines
+cor_volatile_quality_red <- cor(
+  subset(combined_data, wine_type == "red")$`volatile acidity`,
+  subset(combined_data, wine_type == "red")$quality
+)
+
+# Correlation of fixed acidity with quality for White Wines
+cor_fixed_quality_white <- cor(
+  subset(combined_data, wine_type == "white")$`fixed acidity`,
+  subset(combined_data, wine_type == "white")$quality
+)
+
+# Correlation of volatile acidity with quality for White Wines
+cor_volatile_quality_white <- cor(
+  subset(combined_data, wine_type == "white")$`volatile acidity`,
+  subset(combined_data, wine_type == "white")$quality
+)
+
+cor_fixed_quality_red
+cor_volatile_quality_red
+cor_fixed_quality_white
+cor_volatile_quality_white
+
+
+correlation_data <- data.frame(
+  Acidity_Type = rep(c("Fixed Acidity", "Volatile Acidity"), times = 2),
+  Wine_Type = c(rep("Red", 2), rep("White", 2)),
+  Correlation = c(cor_fixed_quality_red, cor_volatile_quality_red, cor_fixed_quality_white, cor_volatile_quality_white)
+)
+
+# Visualize the correlations using a bar plot
+ggplot(correlation_data, aes(x = Acidity_Type, y = Correlation, fill = Wine_Type)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Correlation of Acidity with Wine Quality", 
+       y = "Correlation Coefficient",
+       x = "Acidity Type") +
+  scale_fill_manual(values = c("Red" = "red", "White" = "grey80")) +
+  theme_minimal()
+
+
+
+#Means of quality
+acidity_summary <- combined_data %>%
+  group_by(wine_type, quality_category) %>%
+  summarise(
+    mean_fixed_acidity = mean(`fixed acidity`, na.rm = TRUE),
+    mean_volatile_acidity = mean(`volatile acidity`, na.rm = TRUE),
+    .groups = 'drop'
+  )
+
+# Print the summarized data
+print(acidity_summary)
+
+
+
+```
+#When we delve into the specifics of fixed acidity, interesting patterns emerge. For red wines, there is a positive correlation between fixed acidity and quality. The red bar, representing red wines, sits comfortably above the zero line. This implies that red wines with higher fixed acidity levels tend to be perceived as of higher quality. In contrast, white wines show a slightly different trend. The grey bar for white wines, albeit just below the zero line, suggests a very mild negative correlation. This indicates that white wines with higher fixed acidity might be perceived as slightly lower in quality, though the relationship is weak.
+
+#Volatile acidity showcases a more pronounced trend. For red wines, the correlation is strongly negative. As the red bar plunges below the zero mark, it becomes evident that an increase in volatile acidity is detrimental to the perceived quality of red wines. White wines, while also showcasing a negative correlation with volatile acidity, have a less pronounced dip. This suggests that while higher levels of volatile acidity might affect the perceived quality of white wines, the impact isn't as pronounced as it is for red wines.
+
+```{r}
+#Visualization and correlation of wines by ph
+
+combined_data$quality_group <- ifelse(combined_data$quality < 6, "Below 6", "6 and Above")
+
+
+ggplot(combined_data, aes(x = quality_group, y = pH, fill = wine_type)) +
+  geom_boxplot() +
+  labs(title = "Distribution of pH for Quality Groups by Wine Type", 
+       y = "pH", 
+       x = "Quality Group") +
+  theme_minimal() +
+  facet_wrap(~wine_type, scales = "free_x") +
+  scale_fill_manual(values = c("red", "white"))
+
+
+combined_data <- bind_rows(
+  red = data_red,
+  white = data_white,
+  .id = "wine_type"
+)
+
+#Correlation of ph
+correlation_data <- combined_data %>%
+  mutate(quality_group = ifelse(quality >= 6, "6 and above", "below 6")) %>%
+  group_by(wine_type, quality_group) %>%
+  summarise(correlation = cor(pH, quality), .groups = "drop")
+
+print(correlation_data)
+
+ggplot(correlation_data, aes(x = wine_type, y = correlation, fill = wine_type)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_wrap(~quality_group, ncol = 2) +
+  labs(title = "Correlation between pH and Quality by Wine Type and Quality Group", 
+       y = "Correlation Coefficient", 
+       x = "Wine Type") +
+  theme_minimal() +
+  scale_fill_manual(values = c("red" = "red", "white" = "gray"), name = "Wine Type") +
+  geom_hline(yintercept = 0, linetype="dashed")  # to show the zero line
+
+
+#Means
+ph_summary <- combined_data %>%
+  group_by(wine_type, quality_category) %>%
+  summarise(
+    mean_ph = mean(pH, na.rm = TRUE),
+    .groups = 'drop'
+  )
+
+ggplot(combined_data, aes(x = as.factor(quality), y = pH, fill = wine_type)) +
+  geom_boxplot() +
+  labs(title = "Distribution of pH Levels Across Wine Quality Ratings", 
+       x = "Wine Quality Rating", 
+       y = "pH") +
+  theme_minimal() +
+  facet_wrap(~wine_type, scales = "free_x") +
+  scale_fill_manual(values = c("red" = "red", "white" = "grey80"))
+
+
+# Print the summarized data
+print(ph_summary)
+
+
+
+
+```
+#For red wines, those in the "6 and Above" quality group exhibit a slightly broader pH distribution than those in the "Below 6" group. The median pH value for higher-quality red wines sits just above 3.5, while for the lower-quality group, it remains consistent around the same mark. It is intriguing to note the presence of outliers, especially for the higher-quality red wines. These outliers stretch towards the higher end of the pH scale, nearing 4.0. This suggests that while most high-quality red wines maintain a pH close to 3.5, there are exceptions that lean towards a more alkaline pH.
+
+#White wines showcase a different pattern. Those classified in the "6 and Above" quality bracket have a narrower pH range, with the median resting slightly below 3.5. In contrast, the white wines categorized as "Below 6" in quality exhibit a wider pH distribution, and their median pH sits closer to 3.0. The stark difference in the pH distribution width between the two quality groups for white wines is noteworthy. Additionally, there are outliers in the higher pH range for both quality categories, with the "6 and Above" group having more pronounced outliers.
+
+#Comparing the two wine types, it's evident that red wines, irrespective of their quality, tend to have pH values centered around 3.5. White wines, conversely, display more variability based on quality. Higher quality white wines gravitate towards a pH value just below 3.5, while their lower-quality counterparts hover closer to 3.0.
+
+#Such variations in pH levels can influence a wine's taste, mouthfeel, and overall profile. For example, wines with lower pH values are typically described as crisp or tart, while those with higher pH values might feel rounder or softer on the palate. The data emphasizes the nuanced interplay between pH and perceived wine quality, with variations in patterns between red and white wines, underscoring the importance of considering wine type when analyzing such relationships.
+
+##Conclusion and Future Directions
+
+#As we conclude this detailed analysis of the Vinho Verde wine dataset, several key takeaways emerge, each highlighting the complex interplay between the physicochemical properties of wine and its perceived quality. Our findings not only contribute to the understanding of wine characteristics but also touch upon broader themes such as consumer impact, economic influence, the democratization of wine knowledge, and the potential for innovation in wine evaluation.
+
+#Consumer Impact: Our analysis underscores the profound influence of expert ratings on consumer choices and wine discovery experiences. It raises important questions about how these ratings might shape, limit, or expand our exploration and enjoyment of different wines.
+
+#Economic Influence: The study highlights how expert ratings can drive market trends and impact the wine industry's economy. This insight is crucial for understanding the power of ratings in determining the success and visibility of wine brands.
+
+#Democratizing Wine Knowledge: By examining the diversity of wine properties and ratings, we contribute to challenging the monopoly of a few experts and advocate for a more inclusive wine culture that caters to varied tastes and backgrounds.
+
+#Transparency and Trust: Our findings draw attention to the potential biases in expert ratings and the importance of transparent evaluations in fostering consumer trust and promoting ethical industry practices.
+
+#Advancing Wine Science: The use of scientific methods in our analysis paves the way for more objective and precise wine tasting and scoring techniques, highlighting how scientific advancements can refine the art of wine evaluation.
+
+#Personal Experience: This study encourages wine enthusiasts to be aware of biases and methodologies in wine ratings, emphasizing the value of individual preference and discovery in the world of wine.
+
+#Innovation in Evaluation: The potential of emerging technologies like machine learning in revolutionizing wine quality assessment is a promising area for future research.
+
+#Cultural Significance: Recognizing wine as a cultural element, this analysis helps understand how the evaluation of wine intertwines with cultural heritage and global appreciation.
+
+#Looking Ahead: This study opens several avenues for future inquiry. One key question is the relationship between alcohol content and wine quality. Our analysis suggests a nuanced relationship, especially in higher quality wines, but further investigation could reveal deeper insights into how this variable interacts with other factors like aging process and grape variety. Another intriguing area is the variance in acidity levels and pH values between red and white wines and their impact on taste and quality perception.
+
+#Finally, the presence of outliers in certain quality brackets prompts questions about unique production methodologies and the balance of flavors. Exploring these aspects could provide a richer understanding of the diversity and complexity inherent in wine production and appreciation.
+
+#In summary, this study not only enhances our understanding of Vinho Verde wines but also sets the stage for broader discussions and explorations in the field of wine science and culture. The insights gleaned here serve as a foundation for further research, aimed at deepening our appreciation and knowledge of this fascinating beverage.
