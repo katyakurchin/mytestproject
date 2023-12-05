@@ -8,35 +8,35 @@ This project focuses on analyzing the wine quality dataset, specifically the Por
 - To employ data science techniques for a nuanced understanding of wine quality determinants.
 
 ## Repository Structure
-datasets/: Contains the datasets used in the analysis.
-analysis_code/: R scripts with the exploratory data analysis.
-renv/: R environment files for replicating the project setup.
-README.md: This file, providing an overview and instructions.
+- datasets/: Contains the datasets used in the analysis.
+- analysis_code/: R scripts with the exploratory data analysis.
+- renv/: R environment files for replicating the project setup.
+- README.md: This file, providing an overview and instructions.
 
 ## Datasets
 The project utilizes two datasets:
 
-winequality-red.csv: Data on red Vinho Verde wine samples.
-winequality-white.csv: Data on white Vinho Verde wine samples.
+- winequality-red.csv: Data on red Vinho Verde wine samples.
+- winequality-white.csv: Data on white Vinho Verde wine samples.
 
 ## Tools and Technologies
-R: Used for data analysis and visualization.
-renv: For R environment management.
-Various R packages including httr, readr, dplyr, tidyr, ggplot2, and reshape2.
+- R: Used for data analysis and visualization.
+- renv: For R environment management.
+- Various R packages including httr, readr, dplyr, tidyr, ggplot2, and reshape2.
 
 ## Getting Started
 To run this project locally:
 
-Clone the repository to your local machine.
-Install R and ensure it's properly set up in your system.
-Navigate to the project directory and open R.
-Run renv::restore() to install the necessary packages.
-Execute the scripts or notebooks within the analysis_code/ directory.
+- Clone the repository to your local machine.
+- Install R and ensure it's properly set up in your system.
+- Navigate to the project directory and open R.
+- Run renv::restore() to install the necessary packages.
+- Execute the scripts or notebooks within the analysis_code/ directory.
 
 ## Code Analysis Overview
 The analysis involves:
 
-Loading and preprocessing the dataset.
-Exploratory data analysis on various wine properties such as acidity levels, sugar content, alcohol content, etc.
-Comparative analysis of red and white Vinho Verde wines.
-Statistical summaries and visualizations to uncover patterns and insights.
+- Loading and preprocessing the dataset.
+- Exploratory data analysis on various wine properties such as acidity levels, sugar content, alcohol content, etc.
+- Comparative analysis of red and white Vinho Verde wines.
+- Statistical summaries and visualizations to uncover patterns and insights.
